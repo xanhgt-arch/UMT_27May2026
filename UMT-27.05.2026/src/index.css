@@ -1,0 +1,542 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/inter";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Geist Variable', 'Inter Variable', system-ui, sans-serif;
+    --font-sans: 'Geist Variable', 'Inter Variable', system-ui, sans-serif;
+
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+
+    --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
+
+    /* Cooper Standard secondary brand mark */
+    --color-brand-gold: var(--brand-gold);
+    --color-brand-gold-foreground: var(--brand-gold-foreground);
+    --color-brand-blue: var(--brand-blue);
+
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+/* ─────────────────────────────────────────────
+   Cooper Standard — light theme (default)
+   Pure-white canvas. Royal blue authority.
+   Golden yellow as the brand spark. Hairline
+   borders define surfaces; color is reserved
+   for moments that earn it.
+   ───────────────────────────────────────────── */
+:root {
+    /* canvas + surfaces — mostly white, a single drop of cool */
+    --background: oklch(0.995 0.002 250);          /* near-pure cool white */
+    --foreground: oklch(0.22 0.025 250);           /* deep slate */
+    --card: oklch(1 0 0);                          /* pure white surfaces float */
+    --card-foreground: oklch(0.22 0.025 250);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.22 0.025 250);
+
+    /* primary = Cooper Standard royal blue */
+    --primary: oklch(0.43 0.17 256);
+    --primary-foreground: oklch(0.99 0 0);
+
+    /* neutral chrome */
+    --secondary: oklch(0.972 0.005 250);
+    --secondary-foreground: oklch(0.30 0.020 250);
+    --muted: oklch(0.978 0.004 250);
+    --muted-foreground: oklch(0.51 0.015 250);
+    --accent: oklch(0.962 0.025 256);              /* very pale brand-blue tint */
+    --accent-foreground: oklch(0.34 0.13 256);
+
+    /* brand secondary = the yellow swoosh */
+    --brand-blue: oklch(0.43 0.17 256);
+    --brand-gold: oklch(0.83 0.16 88);
+    --brand-gold-foreground: oklch(0.30 0.07 78);
+
+    /* status — semantic, brand-tuned */
+    --destructive: oklch(0.62 0.16 27);
+    --success: oklch(0.62 0.13 156);
+    --success-foreground: oklch(0.99 0 0);
+    --warning: oklch(0.78 0.14 85);                /* pulls toward brand gold */
+    --warning-foreground: oklch(0.30 0.05 80);
+    --info: oklch(0.55 0.13 256);                  /* brand-blue info */
+    --info-foreground: oklch(0.99 0 0);
+
+    /* edges & rings — hairline */
+    --border: oklch(0.92 0.005 250);
+    --input: oklch(0.92 0.005 250);
+    --ring: oklch(0.43 0.17 256 / 0.45);
+
+    /* charts — Cooper Standard brand palette walking blue -> gold
+       so every graph reads in the company colours. Lightness is
+       stepped to keep adjacent slices distinguishable. */
+    --chart-1: oklch(0.43 0.17 256);   /* brand blue (deep) */
+    --chart-2: oklch(0.83 0.16 88);    /* brand gold */
+    --chart-3: oklch(0.58 0.15 250);   /* mid blue */
+    --chart-4: oklch(0.75 0.14 65);    /* warm amber */
+    --chart-5: oklch(0.72 0.13 230);   /* sky / cool */
+    --chart-6: oklch(0.62 0.13 75);    /* deep bronze */
+
+    --radius: 0.75rem;                 /* precise, but not severe */
+
+    /* sidebar — pure white, separated by a hairline */
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.30 0.018 250);
+    --sidebar-primary: oklch(0.43 0.17 256);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: oklch(0.962 0.025 256);
+    --sidebar-accent-foreground: oklch(0.34 0.13 256);
+    --sidebar-border: oklch(0.92 0.005 250);
+    --sidebar-ring: oklch(0.43 0.17 256 / 0.45);
+}
+
+.dark {
+    --background: oklch(0.18 0.022 256);
+    --foreground: oklch(0.96 0.005 250);
+    --card: oklch(0.22 0.020 256);
+    --card-foreground: oklch(0.96 0.005 250);
+    --popover: oklch(0.22 0.020 256);
+    --popover-foreground: oklch(0.96 0.005 250);
+
+    --primary: oklch(0.72 0.14 256);
+    --primary-foreground: oklch(0.18 0.022 256);
+
+    --secondary: oklch(0.27 0.015 256);
+    --secondary-foreground: oklch(0.96 0.005 250);
+    --muted: oklch(0.27 0.015 256);
+    --muted-foreground: oklch(0.72 0.012 250);
+    --accent: oklch(0.32 0.06 256);
+    --accent-foreground: oklch(0.92 0.05 256);
+
+    --brand-blue: oklch(0.72 0.14 256);
+    --brand-gold: oklch(0.85 0.16 88);
+    --brand-gold-foreground: oklch(0.20 0.05 80);
+
+    --destructive: oklch(0.70 0.17 27);
+    --success: oklch(0.74 0.13 156);
+    --success-foreground: oklch(0.18 0.02 156);
+    --warning: oklch(0.84 0.14 85);
+    --warning-foreground: oklch(0.20 0.05 80);
+    --info: oklch(0.74 0.12 256);
+    --info-foreground: oklch(0.18 0.022 256);
+
+    --border: oklch(1 0 0 / 0.10);
+    --input: oklch(1 0 0 / 0.14);
+    --ring: oklch(0.72 0.14 256 / 0.55);
+
+    /* Dark-mode brand palette — same blue->gold story, but with
+       lighter L for legibility on the dark canvas. */
+    --chart-1: oklch(0.72 0.14 256);   /* brand blue */
+    --chart-2: oklch(0.85 0.16 88);    /* brand gold */
+    --chart-3: oklch(0.78 0.12 248);   /* lighter blue */
+    --chart-4: oklch(0.82 0.15 65);    /* warm amber */
+    --chart-5: oklch(0.82 0.11 230);   /* sky / cool */
+    --chart-6: oklch(0.70 0.13 75);    /* bronze */
+
+    --sidebar: oklch(0.20 0.022 256);
+    --sidebar-foreground: oklch(0.92 0.005 250);
+    --sidebar-primary: oklch(0.72 0.14 256);
+    --sidebar-primary-foreground: oklch(0.18 0.022 256);
+    --sidebar-accent: oklch(0.32 0.06 256);
+    --sidebar-accent-foreground: oklch(0.92 0.05 256);
+    --sidebar-border: oklch(1 0 0 / 0.10);
+    --sidebar-ring: oklch(0.72 0.14 256 / 0.55);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+  }
+  /* Numbers used in metrics use tabular figures for steady alignment */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.01em;
+  }
+  /* Soft focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@utility brand-page-bg {
+  pointer-events: none;
+  overflow: hidden;
+  contain: paint;
+  background-image:
+    radial-gradient(circle at 18% 16%, oklch(0.83 0.16 88 / 0.18) 0 1.5px, transparent 1.8px),
+    radial-gradient(circle at 72% 22%, oklch(0.43 0.17 256 / 0.16) 0 1.5px, transparent 1.8px),
+    radial-gradient(circle at 42% 78%, oklch(0.83 0.16 88 / 0.14) 0 1.3px, transparent 1.7px),
+    linear-gradient(115deg, transparent 0 43%, oklch(0.83 0.16 88 / 0.12) 43.2% 43.8%, transparent 44% 100%),
+    linear-gradient(145deg, transparent 0 55%, oklch(0.43 0.17 256 / 0.09) 55.2% 55.7%, transparent 56% 100%),
+    radial-gradient(circle at 1px 1px, oklch(0.43 0.17 256 / 0.12) 1px, transparent 1.6px),
+    linear-gradient(180deg, oklch(0.995 0.002 250), oklch(0.972 0.011 250));
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 24px 24px, 100% 100%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(108deg, transparent 0 28%, oklch(0.43 0.17 256 / 0.075) 28.1% 28.22%, transparent 28.35% 100%),
+      linear-gradient(108deg, transparent 0 64%, oklch(0.83 0.16 88 / 0.09) 64.1% 64.24%, transparent 64.35% 100%);
+    mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, oklch(0.43 0.17 256 / 0.10) 1px, transparent 1.7px),
+      radial-gradient(circle at 1px 1px, oklch(0.83 0.16 88 / 0.12) 1px, transparent 1.6px);
+    background-position: 0 0, 42px 28px;
+    background-size: 84px 84px, 104px 104px;
+    mask-image: radial-gradient(ellipse at center, black 0 58%, transparent 78%);
+  }
+}
+
+@keyframes umt-loader-orbit {
+  0% {
+    transform: rotate(0deg) scale(1);
+    border-color: oklch(0.43 0.17 256 / 0.16);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.04);
+    border-color: oklch(0.83 0.16 88 / 0.34);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    border-color: oklch(0.43 0.17 256 / 0.16);
+  }
+}
+
+@keyframes umt-loader-progress {
+  0% {
+    transform: translateX(-92%) scaleX(0.42);
+  }
+  45% {
+    transform: translateX(-18%) scaleX(0.82);
+  }
+  100% {
+    transform: translateX(138%) scaleX(0.46);
+  }
+}
+
+.umt-loader-bg {
+  --loader-x: 50%;
+  --loader-y: 44%;
+}
+
+.umt-loader-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--loader-x) var(--loader-y), oklch(0.83 0.16 88 / 0.18), transparent 28%),
+    radial-gradient(circle at calc(var(--loader-x) + 8%) calc(var(--loader-y) + 10%), oklch(0.43 0.17 256 / 0.16), transparent 34%);
+  transition: background-position 160ms ease-out;
+  will-change: background;
+  z-index: 1;
+}
+
+.umt-loader-orbit {
+  border-top-color: oklch(0.43 0.17 256 / 0.68);
+  border-right-color: transparent;
+  animation: umt-loader-orbit 3.6s linear infinite;
+  will-change: transform;
+}
+
+.umt-loader-orbit-delay {
+  animation-duration: 4.6s;
+  animation-direction: reverse;
+  border-top-color: oklch(0.83 0.16 88 / 0.74);
+}
+
+.umt-loader-progress {
+  transform-origin: left center;
+  animation: umt-loader-progress 1.65s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  background-image: linear-gradient(
+    90deg,
+    oklch(0.43 0.17 256),
+    oklch(0.83 0.16 88),
+    oklch(0.43 0.17 256)
+  );
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .umt-loader-orbit,
+  .umt-loader-progress {
+    animation: none;
+  }
+
+  .umt-loader-bg *,
+  .umt-loader-bg::before {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.dark .brand-page-bg {
+  background-image:
+    radial-gradient(circle at 18% 16%, oklch(0.85 0.16 88 / 0.18) 0 1.5px, transparent 1.8px),
+    radial-gradient(circle at 72% 22%, oklch(0.72 0.14 256 / 0.18) 0 1.5px, transparent 1.8px),
+    radial-gradient(circle at 42% 78%, oklch(0.85 0.16 88 / 0.13) 0 1.3px, transparent 1.7px),
+    linear-gradient(115deg, transparent 0 43%, oklch(0.85 0.16 88 / 0.14) 43.2% 43.8%, transparent 44% 100%),
+    linear-gradient(145deg, transparent 0 55%, oklch(0.72 0.14 256 / 0.15) 55.2% 55.7%, transparent 56% 100%),
+    radial-gradient(circle at 1px 1px, oklch(0.72 0.14 256 / 0.15) 1px, transparent 1.6px),
+    linear-gradient(180deg, oklch(0.18 0.022 256), oklch(0.15 0.018 256));
+}
+
+@utility brand-sidebar-bg {
+  isolation: isolate;
+  contain: paint;
+  background-image:
+    radial-gradient(circle at 20px 24px, oklch(0.43 0.17 256 / 0.16) 0 1.3px, transparent 1.7px),
+    radial-gradient(circle at 56px 72px, oklch(0.83 0.16 88 / 0.18) 0 1.3px, transparent 1.7px),
+    linear-gradient(130deg, oklch(0.43 0.17 256 / 0.12) 0 1px, transparent 1px 36px),
+    linear-gradient(50deg, oklch(0.83 0.16 88 / 0.14) 0 1px, transparent 1px 42px),
+    linear-gradient(180deg, oklch(1 0 0 / 0.80), oklch(0.972 0.011 250 / 0.88));
+  background-size: 72px 72px, 96px 96px, 36px 36px, 42px 42px, 100% 100%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(160deg, transparent 0 18%, oklch(0.43 0.17 256 / 0.09) 18.2% 18.7%, transparent 19% 100%),
+      linear-gradient(160deg, transparent 0 58%, oklch(0.83 0.16 88 / 0.10) 58.2% 58.7%, transparent 59% 100%);
+  }
+}
+
+.dark .brand-sidebar-bg {
+  background-image:
+    radial-gradient(circle at 20px 24px, oklch(0.72 0.14 256 / 0.18) 0 1.3px, transparent 1.7px),
+    radial-gradient(circle at 56px 72px, oklch(0.85 0.16 88 / 0.16) 0 1.3px, transparent 1.7px),
+    linear-gradient(130deg, oklch(0.72 0.14 256 / 0.16) 0 1px, transparent 1px 36px),
+    linear-gradient(50deg, oklch(0.85 0.16 88 / 0.14) 0 1px, transparent 1px 42px),
+    linear-gradient(180deg, oklch(0.20 0.022 256 / 0.90), oklch(0.16 0.018 256 / 0.95));
+}
+
+.dark .brand-sidebar-bg::before {
+  background-image:
+    linear-gradient(160deg, transparent 0 18%, oklch(0.72 0.14 256 / 0.12) 18.2% 18.7%, transparent 19% 100%),
+    linear-gradient(160deg, transparent 0 58%, oklch(0.85 0.16 88 / 0.10) 58.2% 58.7%, transparent 59% 100%);
+}
+
+/* Brand hairline used at the very top of the viewport — the only place
+   gold and blue sit beside each other, echoing the swoosh in the logo. */
+@utility brand-hairline {
+  background-image: linear-gradient(
+    90deg,
+    oklch(0.43 0.17 256) 0%,
+    oklch(0.43 0.17 256) 34%,
+    oklch(0.83 0.16 88) 50%,
+    oklch(0.43 0.17 256) 66%,
+    oklch(0.43 0.17 256) 100%
+  );
+}
+
+/* Vertical sibling of brand-hairline — for the sidebar's right edge.
+   Repeats blue ↔ gold four times down the height so the rail reads as
+   rhythmic banding rather than a single pulse, while still starting and
+   ending in blue for continuity with the top hairline. */
+@utility brand-hairline-v {
+  background-image: linear-gradient(
+    180deg,
+    oklch(0.43 0.17 256) 0%,
+    oklch(0.83 0.16 88) 12.5%,
+    oklch(0.43 0.17 256) 25%,
+    oklch(0.83 0.16 88) 37.5%,
+    oklch(0.43 0.17 256) 50%,
+    oklch(0.83 0.16 88) 62.5%,
+    oklch(0.43 0.17 256) 75%,
+    oklch(0.83 0.16 88) 87.5%,
+    oklch(0.43 0.17 256) 100%
+  );
+}
+
+/* Full-width gold spark — the warm pulse of the swoosh, used as a
+   subtle stripe on KPI cards and section headers. */
+@utility brand-spark {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.83 0.16 88 / 0.55) 18%,
+    oklch(0.83 0.16 88) 50%,
+    oklch(0.83 0.16 88 / 0.55) 82%,
+    transparent 100%
+  );
+}
+
+/* Solid blue → gold → blue stripe for card tops. Slightly richer than
+   the hairline so it reads at the top of a card without competing
+   with the chrome. */
+@utility brand-edge-top {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    background-image: linear-gradient(
+      90deg,
+      oklch(0.43 0.17 256) 0%,
+      oklch(0.43 0.17 256) 30%,
+      oklch(0.83 0.16 88) 50%,
+      oklch(0.43 0.17 256) 70%,
+      oklch(0.43 0.17 256) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* Gold left rail — used to mark active rows / important callouts.
+   Reads as a quiet highlight, not a warning. */
+@utility brand-rail-gold {
+  box-shadow: inset 3px 0 0 0 oklch(0.83 0.16 88);
+}
+@utility brand-rail-blue {
+  box-shadow: inset 3px 0 0 0 oklch(0.43 0.17 256);
+}
+
+/* Small two-tone accent: a short blue bar with a gold dot — used
+   under page titles to echo the swoosh. */
+@utility brand-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  &::before {
+    content: "";
+    width: 28px;
+    height: 3px;
+    border-radius: 999px;
+    background: oklch(0.43 0.17 256);
+  }
+  &::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: oklch(0.83 0.16 88);
+    box-shadow: 0 0 0 2px oklch(0.83 0.16 88 / 0.18);
+  }
+}
+
+/* Subtle card hover lift — tinted with the brand blue so even motion
+   carries identity. */
+@utility card-hover {
+  @apply transition-all duration-200;
+  &:hover {
+    box-shadow: 0 4px 18px -10px oklch(0.43 0.17 256 / 0.16);
+    transform: translateY(-1px);
+  }
+}
+
+/* Brand-tinted dual shadow — strong Cooper blue glow on the left/bottom
+   and a warm gold glow on the right/bottom. Always-on (not hover-driven) so
+   each chart card carries the Cooper Standard identity at rest. Two layers
+   per color: a wide soft ambient drop plus a tighter, more saturated inner
+   layer so the colors read as a true brand glow, not just a faint tint. */
+@utility card-brand-shadow {
+  box-shadow:
+    -10px 10px 28px -12px oklch(0.43 0.17 256 / 0.32),
+     -3px  4px 10px  -4px oklch(0.43 0.17 256 / 0.20),
+     10px 10px 28px -12px oklch(0.83 0.16 88 / 0.38),
+      3px  4px 10px  -4px oklch(0.83 0.16 88 / 0.24);
+}
+
+.dark .card-brand-shadow {
+  box-shadow:
+    -10px 10px 28px -12px oklch(0.55 0.20 256 / 0.45),
+     -3px  4px 10px  -4px oklch(0.55 0.20 256 / 0.30),
+     10px 10px 28px -12px oklch(0.83 0.16 88 / 0.35),
+      3px  4px 10px  -4px oklch(0.83 0.16 88 / 0.22);
+}
+
+/* Branded card — pure-white surface with a gold top accent. Used for
+   KPI tiles and other "first read" cards so the brand identity is felt
+   even before content is parsed. */
+@utility brand-card {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    border-radius: 999px;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(0.83 0.16 88 / 0.4) 15%,
+      oklch(0.83 0.16 88) 50%,
+      oklch(0.83 0.16 88 / 0.4) 85%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+}
