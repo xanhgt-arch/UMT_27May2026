@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
+using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
 using Newtonsoft.Json;
@@ -13,7 +13,7 @@ namespace UMT.Backend.Services
     public class RawSessionsService
     {
         private readonly MySqlConnectionFactory _factory;
-        private static readonly MemoryCache cache = MemoryCache.Default;
+        private static readonly SemaphoreSlim GenerateLock = new SemaphoreSlim(1, 1);
 
         public RawSessionsService(MySqlConnectionFactory factory)
         {
@@ -22,9 +22,19 @@ namespace UMT.Backend.Services
 
         public async Task GenerateJson()
         {
-            if (cache.Contains("sessions"))
-                return;
+            await GenerateLock.WaitAsync();
+            try
+            {
+                await GenerateJsonCore();
+            }
+            finally
+            {
+                GenerateLock.Release();
+            }
+        }
 
+        private async Task GenerateJsonCore()
+        {
             var rows = LoadData();
 
             // ✅ RAW JSON (your original format)
@@ -58,7 +68,6 @@ namespace UMT.Backend.Services
                 WriteJsonAsync(Path.Combine(basePath, "domains.json"), domains)
             );
 
-            cache.Set("sessions", true, DateTimeOffset.Now.AddMinutes(5));
         }
 
 
@@ -104,22 +113,27 @@ namespace UMT.Backend.Services
                 start.ToString("yyyy-MM-dd HH:mm:ss"),
                 start.Year,
                 start.Month - 1,
-                row.IsVDI != null && row.IsVDI.ToString() == "1" ? "VDI" : "Non-VDI"
+                IsTruthy(row.IsVDI) ? "VDI" : "Non-VDI"
             };
         }
 
         private List<object> BuildVdiUsers(List<object[]> rows)
         {
             return rows
-                .Where(r => Convert.ToString(r[13]) == "VDI")
+                .Where(r => Convert.ToString(r[20]) == "VDI")
                 .GroupBy(r => Convert.ToString(r[5]).ToLower())
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
-                .Select(g => g.First())
+                .Select(g => g.OrderByDescending(r => ToLong(r[12])).First())
                 .Select((row, i) => new
                 {
-                    id = "vdi-" + (i + 1),
-                    user = row[5],
-                    domain = row[7]
+                    id = "vdi-" + (i + 1).ToString("D3"),
+                    fullName = ToDisplayName(row[5]),
+                    email = ToEmail(row[5]),
+                    domain = Convert.ToString(row[7]),
+                    region = EmptyToDefault(row[8], "NA"),
+                    hostname = Convert.ToString(row[6]),
+                    status = ToVdiStatus(row[19]),
+                    lastSeen = ToIsoDate(row[12])
                 })
                 .Cast<object>()
                 .ToList();
@@ -130,15 +144,115 @@ namespace UMT.Backend.Services
             return rows
                 .GroupBy(r => Convert.ToString(r[7]))
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+                .OrderBy(g => g.Key)
                 .Select((g, i) => new
                 {
-                    id = "dom-" + (i + 1),
-                    domain = g.Key,
+                    id = "dom-" + (i + 1).ToString("D3"),
+                    technicalDomain = g.Key,
+                    corporateGroup = ToTitleCase(g.Key),
+                    region = MostCommon(g.Select(x => Convert.ToString(x[8]))),
                     users = g.Select(x => x[5]).Distinct().Count(),
-                    active = g.Count() > 0
+                    active = g.Any(x => ToLong(x[12]) > 0)
                 })
                 .Cast<object>()
                 .ToList();
+        }
+
+        private static string EmptyToDefault(object value, string fallback)
+        {
+            var text = Convert.ToString(value);
+            return string.IsNullOrWhiteSpace(text) ? fallback : text;
+        }
+
+        private static long ToLong(object value)
+        {
+            if (value == null)
+                return 0;
+
+            long result;
+            return long.TryParse(Convert.ToString(value), out result) ? result : 0;
+        }
+
+        private static string ToTitleCase(object value)
+        {
+            var text = Convert.ToString(value);
+            if (string.IsNullOrWhiteSpace(text))
+                return "Unknown";
+
+            var words = text.Split(new[] { ' ', '_', '.', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(" ", words.Select(word =>
+                char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
+        }
+
+        private static string ToDisplayName(object userId)
+        {
+            var text = Convert.ToString(userId);
+            if (string.IsNullOrWhiteSpace(text))
+                return "Unknown User";
+
+            return ToTitleCase(text.Split('@')[0]);
+        }
+
+        private static string ToEmail(object userId)
+        {
+            var text = Convert.ToString(userId);
+            if (string.IsNullOrWhiteSpace(text))
+                return "unknown@cooperstandard.com";
+
+            return text.Contains("@") ? text : text.ToLowerInvariant() + "@cooperstandard.com";
+        }
+
+        private static string ToVdiStatus(object status)
+        {
+            var text = MapStatus(status);
+            if (text == "Active")
+                return "Active";
+            if (text == "Failed")
+                return "Disabled";
+            return "Inactive";
+        }
+
+        private static string MapStatus(object status)
+        {
+            var text = Convert.ToString(status)?.ToUpperInvariant();
+            if (text == "SUCCESS")
+                return "Completed";
+            if (text == "FAILED")
+                return "Failed";
+            if (text == "STOPPED")
+                return "Stopped";
+            if (text == "ACTIVE")
+                return "Active";
+            return "Completed";
+        }
+
+        private static bool IsTruthy(object value)
+        {
+            if (value == null)
+                return false;
+
+            var text = Convert.ToString(value);
+            return text == "1" || string.Equals(text, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string ToIsoDate(object epochMs)
+        {
+            var ms = ToLong(epochMs);
+            if (ms <= 0)
+                return DateTime.UtcNow.ToString("o");
+
+            return DateTimeOffset.FromUnixTimeMilliseconds(ms).UtcDateTime.ToString("o");
+        }
+
+        private static string MostCommon(IEnumerable<string> values)
+        {
+            return values
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .GroupBy(value => value)
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key)
+                .Select(g => g.Key)
+                .FirstOrDefault() ?? "NA";
         }
 
         private async Task WriteJsonAsync<T>(string fullPath, T data)
@@ -194,18 +308,18 @@ namespace UMT.Backend.Services
 
                 validStart ? start.Year : 0,                     // 14
                 validStart ? start.Month - 1 : 0,                // 15 ✅ 0-based
-                validStart ? start.Day : 0,                      // 16 ✅ IMPORTANT (you missed earlier)
+                validStart ? start.Day - 1 : 0,                  // 16 0-based day index
 
                 validStart ? start.ToString("yyyy-MM") : null,   // 17
                 validStart ? start.ToString("MMM ''yy") : null,  // 18 ✅ EXACT FORMAT (Jan '19)
 
-                row.Status,                                     // 19
+                MapStatus(row.Status),                          // 19
 
-                row.IsVDI != null && row.IsVDI.ToString() == "1"
+                IsTruthy(row.IsVDI)
                     ? "VDI"
                     : "Non-VDI",                                // 20 ✅ matches frontend type
 
-                row.IsProd != null && row.IsProd.ToString() == "1"  // 21 ✅ BOOLEAN (VERY IMPORTANT)
+                IsTruthy(row.IsProd)                             // 21 BOOLEAN
             };
         }
     }

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 
 import { AppLoadingScreen } from "@/components/AppLoadingScreen";
 import { AppShell } from "@/components/layout/AppShell";
@@ -14,7 +14,7 @@ const NotFoundPage = lazy(routePreloaders["*"]);
 
 export function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<AppLoadingScreen />}>
         <Routes>
           <Route element={<AppShell />}>
@@ -27,7 +27,7 @@ export function App() {
           </Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

@@ -71,7 +71,7 @@ function toDisplayName(userId) {
 function toEmail(userId) {
   const value = String(userId ?? "").trim();
   if (value.includes("@")) return value;
-  return value ? `${value.toLowerCase()}@engineering.acme.com` : "unknown@engineering.acme.com";
+  return value ? `${value.toLowerCase()}@cooperstandard.com` : "unknown@cooperstandard.com";
 }
 
 function toVdiStatus(status) {

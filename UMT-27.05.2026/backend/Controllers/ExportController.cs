@@ -68,11 +68,8 @@ namespace UMT.Backend.Controllers
         {
             try
             {
-                // ✅ Generate JSON (uses your existing logic)
                 await _service.GenerateJson();
 
-                // ✅ File path (same as service)
-                
                 string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
                 if (string.IsNullOrEmpty(basePath))
@@ -115,6 +112,7 @@ namespace UMT.Backend.Controllers
 
         [HttpGet]
         [Route("raw-sessions-compact")]
+        [Route("raw-sessions-compact-json")]
         public async Task<HttpResponseMessage> DownloadCompactJson()
         {
             return await DownloadFile("raw-sessions-compact.json");
@@ -122,6 +120,7 @@ namespace UMT.Backend.Controllers
 
         [HttpGet]
         [Route("vdi-json")]
+        [Route("vdi")]
         public async Task<HttpResponseMessage> DownloadVdiJson()
         {
             return await DownloadFile("vdi.json");
@@ -129,6 +128,7 @@ namespace UMT.Backend.Controllers
 
         [HttpGet]
         [Route("domains-json")]
+        [Route("domains")]
         public async Task<HttpResponseMessage> DownloadDomainsJson()
         {
             return await DownloadFile("domains.json");
