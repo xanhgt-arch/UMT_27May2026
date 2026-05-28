@@ -79,7 +79,7 @@ export function DomainDialog({
               id="technicalDomain"
               value={form.technicalDomain}
               onChange={(e) => set("technicalDomain", e.target.value)}
-              placeholder="engineering.acme"
+              placeholder="cooperstandard"
               className="h-10 rounded-xl"
             />
           </Field>

@@ -22,15 +22,15 @@ namespace UMT.Backend.Services
 
         public async Task GenerateJson()
         {
-            if (cache.Contains("sessions"))
-                return;
+            // if (cache.Contains("sessions"))
+            //     return;
 
             var rows = LoadData();
 
-            // ✅ RAW JSON (your original format)
+            // RAW JSON (your original format)
             var rawJson = rows;
 
-            // ✅ COMPACT JSON with required format
+            // COMPACT JSON with required format
             var compact = rows
                 .Select((r, i) => ToCompactRowV2(r, i + 1))
                 .ToList();
@@ -41,7 +41,7 @@ namespace UMT.Backend.Services
             var domains = BuildDomains(compactRows);
 
 
-            // ✅ Read env path
+            // Read env path
             string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
             if (string.IsNullOrEmpty(basePath))
@@ -50,7 +50,7 @@ namespace UMT.Backend.Services
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            // ✅ Write files
+            // Write files
             await Task.WhenAll(
                 WriteJsonAsync(Path.Combine(basePath, "raw-sessions.json"), rawJson),
                 WriteJsonAsync(Path.Combine(basePath, "raw-sessions-compact.json"), compact),
@@ -111,31 +111,54 @@ namespace UMT.Backend.Services
         private List<object> BuildVdiUsers(List<object[]> rows)
         {
             return rows
-                .Where(r => Convert.ToString(r[13]) == "VDI")
-                .GroupBy(r => Convert.ToString(r[5]).ToLower())
+                .Where(r => Convert.ToString(r[20]) == "VDI")   
+                .GroupBy(r => Convert.ToString(r[5]).ToLower()) // unique by user
                 .Where(g => !string.IsNullOrWhiteSpace(g.Key))
                 .Select(g => g.First())
-                .Select((row, i) => new
+                .Select((row, i) =>
                 {
-                    id = "vdi-" + (i + 1),
-                    user = row[5],
-                    domain = row[7]
+                    var userId = Convert.ToString(row[5]) ?? "";
+                    var email = userId.Contains("@")
+                        ? userId
+                        : userId.ToLower() + "@cooperstandard.com";
+
+                    return new
+                    {
+                        id = "vdi-" + (i + 1).ToString("D3"),
+                        fullName = ToTitleCase(userId.Split('@')[0]),
+                        email = email,
+                        domain = row[7],
+                        region = row[8],
+                        hostname = row[6],
+                        status = MapStatus(Convert.ToString(row[19])),
+                        lastSeen = Convert.ToInt64(row[12]) > 0
+                            ? DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(row[12])).ToString("o")
+                            : null
+                    };
                 })
                 .Cast<object>()
                 .ToList();
         }
 
+
         private List<object> BuildDomains(List<object[]> rows)
         {
             return rows
-                .GroupBy(r => Convert.ToString(r[7]))
-                .Where(g => !string.IsNullOrWhiteSpace(g.Key))
-                .Select((g, i) => new
+                .Where(r => !string.IsNullOrWhiteSpace(Convert.ToString(r[7])))
+                .GroupBy(r => Convert.ToString(r[7]).ToLower())
+                .Select((g, i) =>
                 {
-                    id = "dom-" + (i + 1),
-                    domain = g.Key,
-                    users = g.Select(x => x[5]).Distinct().Count(),
-                    active = g.Count() > 0
+                    var domain = g.First()[7]?.ToString();
+
+                    return new
+                    {
+                        id = "dom-" + (i + 1).ToString("D3"),
+                        technicalDomain = domain,
+                        corporateGroup = ToTitleCase(domain),
+                        region = g.Select(x => x[8]).FirstOrDefault() ?? "NA",
+                        users = g.Select(x => x[5]).Distinct().Count(),
+                        active = g.Any(x => Convert.ToInt64(x[12]) > 0)
+                    };
                 })
                 .Cast<object>()
                 .ToList();
@@ -162,14 +185,14 @@ namespace UMT.Backend.Services
             DateTime start;
             DateTime stop;
 
-            // ✅ Safe parsing
+            // Safe parsing
             bool validStart = DateTime.TryParse(row.StartTime?.ToString(), out start) && start > DateTime.MinValue;
             bool validStop = DateTime.TryParse(row.StopTime?.ToString(), out stop) && stop > DateTime.MinValue;
 
             if (!validStart) start = DateTime.MinValue;
             if (!validStop) stop = start;
 
-            // ✅ Epoch (safe)
+            // Epoch (safe)
             long startMs = validStart ? new DateTimeOffset(start).ToUnixTimeMilliseconds() : 0;
             long? stopMs = validStop ? new DateTimeOffset(stop).ToUnixTimeMilliseconds() : (long?)null;
 
@@ -208,5 +231,21 @@ namespace UMT.Backend.Services
                 row.IsProd != null && row.IsProd.ToString() == "1"  // 21 ✅ BOOLEAN (VERY IMPORTANT)
             };
         }
+
+        
+        private string ToTitleCase(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return "Unknown";
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                .ToTitleCase(input.ToLower().Replace(".", " ").Replace("_", " "));
+        }
+
+        private string MapStatus(string status)
+        {
+            if (status == "Active") return "Active";
+            if (status == "Failed") return "Disabled";
+            return "Inactive";
+        }
+
     }
 }

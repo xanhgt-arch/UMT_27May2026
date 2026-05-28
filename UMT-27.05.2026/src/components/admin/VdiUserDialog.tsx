@@ -94,7 +94,7 @@ export function VdiUserDialog({
               type="email"
               value={form.email}
               onChange={(e) => set("email", e.target.value)}
-              placeholder="alex.patel@engineering.acme.com"
+              placeholder="alex.patel@cooperstandard.com"
               className="h-10 rounded-xl"
             />
           </Field>

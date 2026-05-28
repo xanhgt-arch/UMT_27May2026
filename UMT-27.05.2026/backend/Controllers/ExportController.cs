@@ -68,10 +68,10 @@ namespace UMT.Backend.Controllers
         {
             try
             {
-                // ✅ Generate JSON (uses your existing logic)
+                
                 await _service.GenerateJson();
 
-                // ✅ File path (same as service)
+                // File path (same as service)
                 
                 string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
@@ -134,41 +134,50 @@ namespace UMT.Backend.Controllers
             return await DownloadFile("domains.json");
         }
 
-        // ✅ Common reusable method
+   
         private async Task<HttpResponseMessage> DownloadFile(string fileName)
         {
-            await _service.GenerateJson();
-
-            string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
-
-            if (string.IsNullOrEmpty(basePath))
-                basePath = AppDomain.CurrentDomain.BaseDirectory;
-
-            string filePath = Path.Combine(basePath, fileName);
-
-            if (!File.Exists(filePath))
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound,
-                    new { message = "File not found" });
-            }
+                await _service.GenerateJson();
 
-            var bytes = File.ReadAllBytes(filePath);
+                string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ByteArrayContent(bytes)
-            };
+                if (string.IsNullOrEmpty(basePath))
+                    basePath = AppDomain.CurrentDomain.BaseDirectory;
 
-            result.Content.Headers.ContentType =
-                new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+                string filePath = Path.Combine(basePath, fileName);
 
-            result.Content.Headers.ContentDisposition =
-                new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                if (!File.Exists(filePath))
                 {
-                    FileName = fileName
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                        new { message = "File not found" });
+                }
+
+                var bytes = File.ReadAllBytes(filePath);
+
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(bytes)
                 };
 
-            return result;
+                result.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                result.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = fileName
+                    };
+
+                return result;
+                }
+            
+                catch (Exception ex) 
+                    {
+                        return Request.CreateResponse(HttpStatusCode.InternalServerError,
+                            new { message = ex.ToString() });
+                    }
         }
     }
 }
