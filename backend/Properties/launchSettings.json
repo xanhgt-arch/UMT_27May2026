@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "UMT.Backend": {
-      "commandName": "IISExpress",
-      "applicationUrl": "http://localhost:7000"
-    }
-  }
-}

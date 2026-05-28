@@ -28,16 +28,12 @@ const VDI_DATA_URLS = [
   normalizedBackendUrl
     ? `${normalizedBackendUrl}/api/export/vdi-json`
     : undefined,
-  "/api/export/vdi-json",
-  "/static/vdi.json",
 ].filter((url): url is string => Boolean(url))
 
 const DOMAIN_DATA_URLS = [
   normalizedBackendUrl
     ? `${normalizedBackendUrl}/api/export/domains-json`
     : undefined,
-  "/api/export/domains-json",
-  "/static/domains.json",
 ].filter((url): url is string => Boolean(url))
 
 async function loadJsonWithFallback<T>(urls: readonly string[]): Promise<T> {

@@ -14,6 +14,7 @@ namespace UMT.Backend.Services
     {
         private readonly MySqlConnectionFactory _factory;
         private static readonly MemoryCache cache = MemoryCache.Default;
+        private static readonly object _lock = new object();
 
         public RawSessionsService(MySqlConnectionFactory factory)
         {
@@ -21,27 +22,23 @@ namespace UMT.Backend.Services
         }
 
         public async Task GenerateJson()
+    {
+        lock (_lock)
         {
-            // if (cache.Contains("sessions"))
-            //     return;
+            
 
             var rows = LoadData();
 
-            // RAW JSON (your original format)
             var rawJson = rows;
 
-            // COMPACT JSON with required format
             var compact = rows
                 .Select((r, i) => ToCompactRowV2(r, i + 1))
                 .ToList();
 
-                
             var compactRows = compact.Cast<object[]>().ToList();
             var vdi = BuildVdiUsers(compactRows);
             var domains = BuildDomains(compactRows);
 
-
-            // Read env path
             string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
             if (string.IsNullOrEmpty(basePath))
@@ -50,16 +47,16 @@ namespace UMT.Backend.Services
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            // Write files
-            await Task.WhenAll(
-                WriteJsonAsync(Path.Combine(basePath, "raw-sessions.json"), rawJson),
-                WriteJsonAsync(Path.Combine(basePath, "raw-sessions-compact.json"), compact),
-                WriteJsonAsync(Path.Combine(basePath, "vdi.json"), vdi),
-                WriteJsonAsync(Path.Combine(basePath, "domains.json"), domains)
-            );
+            WriteJsonSync(Path.Combine(basePath, "raw-sessions.json"), rawJson);
+            WriteJsonSync(Path.Combine(basePath, "raw-sessions-compact.json"), compact);
+            WriteJsonSync(Path.Combine(basePath, "vdi.json"), vdi);
+            WriteJsonSync(Path.Combine(basePath, "domains.json"), domains);
 
-            cache.Set("sessions", true, DateTimeOffset.Now.AddMinutes(5));
+            
         }
+
+        await Task.CompletedTask;
+    }
 
 
         private List<RawUsageRow> LoadData()
@@ -164,7 +161,8 @@ namespace UMT.Backend.Services
                 .ToList();
         }
 
-        private async Task WriteJsonAsync<T>(string fullPath, T data)
+        
+        private void WriteJsonSync<T>(string fullPath, T data)
         {
             var temp = fullPath + ".tmp";
 
@@ -176,9 +174,8 @@ namespace UMT.Backend.Services
                 File.Delete(fullPath);
 
             File.Move(temp, fullPath);
-
-            await Task.CompletedTask;
         }
+
 
         private object[] ToCompactRowV2(RawUsageRow row, int index)
         {

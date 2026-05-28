@@ -49,7 +49,7 @@ function toDisplayName(userId: string): string {
 function toEmail(userId: string): string {
   if (userId.includes("@")) return userId;
   const normalized = userId.trim().toLowerCase();
-  return normalized ? `${normalized}@engineering.acme.com` : "unknown@engineering.acme.com";
+  return normalized ? `${normalized}@cooperstandard.com` : "unknown@cooperstandard.com";
 }
 
 function toVdiStatus(status: SessionStatus): VdiUserRecord["status"] {
