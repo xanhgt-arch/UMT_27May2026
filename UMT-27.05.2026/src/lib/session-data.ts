@@ -58,7 +58,7 @@ async function loadCompactSessions(): Promise<CompactRawSession[]> {
 
   const dataUrls = [
     configuredUrl,
-    backendUrl ? `${backendUrl.replace(/\/$/, "")}/api/export/raw-sessions-compact` : undefined,
+    backendUrl ? `${backendUrl.replace(/\/$/, "")}/api/export/raw-sessions-compact` : undefined,"/static/raw-sessions-compact.json",
   ].filter((url): url is string => Boolean(url));
 
   let lastError: unknown;

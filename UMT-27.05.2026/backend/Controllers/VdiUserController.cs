@@ -10,7 +10,16 @@ namespace UMT.Backend.Controllers
     [RoutePrefix("api/vdi")]
     public class VdiController : ApiController
     {
+
+        
         private readonly MySqlConnectionFactory _factory = new MySqlConnectionFactory();
+
+        private string GetCurrentUser()
+        {
+            return !string.IsNullOrWhiteSpace(User?.Identity?.Name)
+                ? User.Identity.Name
+                : "ADMIN";
+        }
 
         [HttpGet]
         [Route("")]
@@ -87,7 +96,7 @@ namespace UMT.Backend.Controllers
                 {
                     conn.Open();
 
-                    string currentUser = User?.Identity?.Name ?? "ADMIN";
+                    string currentUser = GetCurrentUser();
                     DateTime now = DateTime.Now;
 
                     string sql = @"
@@ -127,11 +136,12 @@ namespace UMT.Backend.Controllers
         {
             try
             {
+                
                 using (var conn = _factory.CreateConnection())
                 {
                     conn.Open();
 
-                    string currentUser = User?.Identity?.Name ?? "ADMIN";
+                    string currentUser = GetCurrentUser();
                     DateTime now = DateTime.Now;
 
                     string sql = @"
@@ -199,4 +209,7 @@ namespace UMT.Backend.Controllers
         public string Domain { get; set; }
         public string Region { get; set; }
     }
+
+    
+
 }
