@@ -36,8 +36,9 @@ namespace UMT.Backend.Services
                 .ToList();
 
             var compactRows = compact.Cast<object[]>().ToList();
-            var vdi = BuildVdiUsers(compactRows);
-            var domains = BuildDomains(compactRows);
+            var vdi = GetVdiUsersFromDb();
+            var domains = GetDomainsFromDb();
+
 
             string basePath = Environment.GetEnvironmentVariable("DASHBOARD_STATIC_DIR");
 
@@ -243,6 +244,91 @@ namespace UMT.Backend.Services
             if (status == "Failed") return "Disabled";
             return "Inactive";
         }
+
+
+        private List<object> GetVdiUsersFromDb()
+        {
+            var list = new List<object>();
+
+            using (var conn = _factory.CreateConnection())
+            {
+                conn.Open();
+
+                string sql = "SELECT UserID, Domain, Region FROM " + _factory.TableName("mst_vdi_user_detail");
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    int index = 1;
+
+                    while (reader.Read())
+                    {
+                        var userId = Convert.ToString(reader["UserID"]);
+
+                        var email = userId.Contains("@")
+                            ? userId
+                            : userId.ToLower() + "@cooperstandard.com";
+
+                        list.Add(new
+                        {
+                            id = "vdi-" + index.ToString("D3"),
+                            fullName = userId,                 // ✅ as you said
+                            email = email,
+                            domain = reader["Domain"],
+                            region = reader["Region"],
+                            hostname = "HOST-" + Guid.NewGuid().ToString("N").Substring(0, 6), // ✅ random
+                            status = "Inactive",              // ✅ default (or from table if exists)
+                            lastSeen = DateTime.UtcNow.ToString("o") // ✅ optional
+                        });
+
+                        index++;
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
+
+        private List<object> GetDomainsFromDb()
+        {
+            var list = new List<object>();
+
+            using (var conn = _factory.CreateConnection())
+            {
+                conn.Open();
+
+                string sql = "SELECT DISTINCT Domain, Region FROM " + _factory.TableName("mst_domain_details");
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    int index = 1;
+
+                    while (reader.Read())
+                    {
+                        var domain = Convert.ToString(reader["Domain"]);
+
+                        list.Add(new
+                        {
+                            id = "dom-" + index.ToString("D3"),
+                            technicalDomain = domain,
+                            corporateGroup = domain,
+                            region = reader["Region"],
+                            users = 1,       
+                            active = true
+                        });
+
+                        index++;
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
 
     }
 }

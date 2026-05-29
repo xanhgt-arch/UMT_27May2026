@@ -53,6 +53,7 @@ export const COMPACT_SESSION = {
 async function loadCompactSessions(): Promise<CompactRawSession[]> {
   const configuredUrl = import.meta.env.VITE_SESSION_DATA_URL as string | undefined;
   const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined;
+
   
 
   const dataUrls = [
