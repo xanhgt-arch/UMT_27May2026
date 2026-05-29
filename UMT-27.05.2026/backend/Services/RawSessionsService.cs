@@ -36,7 +36,7 @@ namespace UMT.Backend.Services
                 .ToList();
 
             var compactRows = compact.Cast<object[]>().ToList();
-            var vdi = GetVdiUsersFromDb();
+            
             var domains = GetDomainsFromDb();
 
 
@@ -50,7 +50,6 @@ namespace UMT.Backend.Services
 
             WriteJsonSync(Path.Combine(basePath, "raw-sessions.json"), rawJson);
             WriteJsonSync(Path.Combine(basePath, "raw-sessions-compact.json"), compact);
-            WriteJsonSync(Path.Combine(basePath, "vdi.json"), vdi);
             WriteJsonSync(Path.Combine(basePath, "domains.json"), domains);
 
             
@@ -278,7 +277,22 @@ namespace UMT.Backend.Services
                             region = reader["Region"],
                             hostname = "HOST-" + Guid.NewGuid().ToString("N").Substring(0, 6), // ✅ random
                             status = "Inactive",              // ✅ default (or from table if exists)
-                            lastSeen = DateTime.UtcNow.ToString("o") // ✅ optional
+                            lastSeen = DateTime.UtcNow.ToString("o"), // ✅ optional
+                            
+                            createdDate = reader["CreatedDate"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["CreatedDate"]).ToString("o")
+                                : null
+                            ,    
+                            createdBy = reader["CreatedBy"],
+                            
+                            
+                            modifiedDate = reader["ModifiedDate"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["ModifiedDate"]).ToString("o")
+                                : null
+                            ,
+                            modifiedBy = reader["ModifiedBy"]
+
+
                         });
 
                         index++;

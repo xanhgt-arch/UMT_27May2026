@@ -68,7 +68,7 @@ function StatCard({
 }
 
 export default function VdiUsersPage() {
-  const { vdiUsers, removeVdiUser } = useAdminData()
+  const { vdiUsers } = useAdminData()
   const [query, setQuery] = useState("")
   const [active, setActive] = useState<VdiUserRecord | null>(null)
   const [editing, setEditing] = useState<VdiUserRecord | null>(null)
@@ -330,12 +330,21 @@ export default function VdiUsersPage() {
         description="This permanently removes the VDI user record. Their tool run history will remain in reports."
         confirmLabel="Delete"
         destructive
-        onConfirm={() => {
+        
+        onConfirm={async () => {
           if (deleting) {
-            removeVdiUser(deleting.id)
-            toast.success(`${deleting.fullName} deleted.`)
+            const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+            await fetch(`${backendUrl}/api/vdi/${deleting.fullName}`, {
+              method: "DELETE",
+            });
+
+            toast.success(`${deleting.fullName} deleted.`);
+
+            window.location.reload(); // ✅ for now
           }
         }}
+
       />
 
       <Card className="border-dashed bg-muted/30">

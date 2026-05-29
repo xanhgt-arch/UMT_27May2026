@@ -12,6 +12,7 @@ namespace UMT.Backend
             var cors = new EnableCorsAttribute("*", "*", "*"); // allow all
             config.EnableCors(cors);
 
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
 
 
             // enable attribute routing

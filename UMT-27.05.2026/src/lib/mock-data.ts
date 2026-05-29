@@ -13,7 +13,6 @@ import type {
   Region,
   RegionUsage,
   SessionStatus,
-  VdiUserRecord,
 } from "./types";
 
 import { COMPACT_SESSION, RAW_SESSION_COMPACT_ROWS } from "./session-data";
@@ -42,21 +41,21 @@ function toTitleCase(value: string): string {
     .join(" ");
 }
 
-function toDisplayName(userId: string): string {
-  return toTitleCase(userId.split("@")[0] ?? "") || "Unknown User";
-}
+// function toDisplayName(userId: string): string {
+//   return toTitleCase(userId.split("@")[0] ?? "") || "Unknown User";
+// }
 
-function toEmail(userId: string): string {
-  if (userId.includes("@")) return userId;
-  const normalized = userId.trim().toLowerCase();
-  return normalized ? `${normalized}@cooperstandard.com` : "unknown@cooperstandard.com";
-}
+// function toEmail(userId: string): string {
+//   if (userId.includes("@")) return userId;
+//   const normalized = userId.trim().toLowerCase();
+//   return normalized ? `${normalized}@cooperstandard.com` : "unknown@cooperstandard.com";
+// }
 
-function toVdiStatus(status: SessionStatus): VdiUserRecord["status"] {
-  if (status === "Active") return "Active";
-  if (status === "Failed") return "Disabled";
-  return "Inactive";
-}
+// function toVdiStatus(status: SessionStatus): VdiUserRecord["status"] {
+//   if (status === "Active") return "Active";
+//   if (status === "Failed") return "Disabled";
+//   return "Inactive";
+// }
 
 function mostCommon<T extends string>(values: T[]): T | "" {
   const counts = new Map<T, number>();
@@ -66,21 +65,6 @@ function mostCommon<T extends string>(values: T[]): T | "" {
   return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? "";
 }
 
-export const VDI_USERS: VdiUserRecord[] = [...new Map(
-  RAW_SESSIONS_NEW
-    .filter((s) => s[S.hardware] === "VDI" && s[S.user])
-    .sort((a, b) => b[S.startMs] - a[S.startMs])
-    .map((s) => [s[S.user].toLowerCase(), s] as const),
-).values()].map((s, i) => ({
-  id: `vdi-${String(i + 1).padStart(3, "0")}`,
-  fullName: toDisplayName(s[S.user]),
-  email: toEmail(s[S.user]),
-  domain: s[S.domain],
-  region: s[S.region],
-  hostname: s[S.machine],
-  status: toVdiStatus(s[S.status]),
-  lastSeen: new Date(s[S.startMs]).toISOString(),
-}));
 
 export const DOMAIN_RECORDS: DomainRecord[] = [...new Map(
   RAW_SESSIONS_NEW

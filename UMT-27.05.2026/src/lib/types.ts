@@ -106,6 +106,12 @@ export interface VdiUserRecord {
   hostname: string;
   status: VdiStatus;
   lastSeen: string;     // ISO
+  
+  createdDate?: string
+  createdBy?: string
+  modifiedDate?: string
+  modifiedBy?: string
+
 }
 
 // Domain mapping — technical domain → corporate group:

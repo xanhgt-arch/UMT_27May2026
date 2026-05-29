@@ -24,11 +24,13 @@ const Ctx = createContext<AdminCtx | null>(null)
 const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined
 const normalizedBackendUrl = backendUrl?.replace(/\/$/, "")
 
+
 const VDI_DATA_URLS = [
   normalizedBackendUrl
-    ? `${normalizedBackendUrl}/api/export/vdi-json`
+    ? `${normalizedBackendUrl}/api/vdi`
     : undefined,
-].filter((url): url is string => Boolean(url))
+].filter((url): url is string => Boolean(url));
+
 
 const DOMAIN_DATA_URLS = [
   normalizedBackendUrl
