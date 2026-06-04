@@ -58,7 +58,7 @@ namespace UMT.Backend.Services
 
         private static string Escape(string value)
         {
-            if (!value.Contains("\"") && !value.Contains(","))
+            if (!value.Contains("\"") && !value.Contains(",") && !value.Contains("\r") && !value.Contains("\n"))
                 return value;
 
             return "\"" + value.Replace("\"", "\"\"") + "\"";

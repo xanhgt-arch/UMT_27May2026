@@ -5,14 +5,24 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useTheme } from "@/components/theme-provider"
 import { useDashboardSearch } from "@/lib/search-context"
+import { useAuth } from "@/lib/auth-context"
 import { BrandMark } from "./BrandMark"
 import { PaletteSwitcher } from "./PaletteSwitcher"
 
 export function Topbar() {
   const { theme, setTheme } = useTheme()
   const { query, setQuery, clearQuery } = useDashboardSearch()
+  const { user } = useAuth()
   const [inputValue, setInputValue] = useState(query)
   const isDark = theme === "dark"
+  const displayUser = user?.userId || "User"
+  const displayRole = user?.isAdmin ? "Administrator" : "User"
+  const initials = displayUser
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("") || "U"
 
   useEffect(() => {
     setInputValue(query)
@@ -95,12 +105,12 @@ export function Topbar() {
         </Button>
         <div className="ml-2 flex items-center gap-3 border-l border-border pl-3">
           <div className="hidden text-right text-sm leading-tight md:block">
-            <div className="font-medium">Alex Patel</div>
-            <div className="text-xs text-muted-foreground">Administrator</div>
+            <div className="font-medium">{displayUser}</div>
+            <div className="text-xs text-muted-foreground">{displayRole}</div>
           </div>
           <Avatar className="size-9 ring-2 ring-primary/15">
             <AvatarFallback className="bg-primary/10 text-sm font-medium text-primary">
-              AP
+              {initials}
             </AvatarFallback>
           </Avatar>
         </div>

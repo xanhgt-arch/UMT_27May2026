@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader"
 import { Button } from "@/components/ui/button"
 import { KpiCard } from "@/components/dashboard/KpiCard"
 import { ChartCard } from "@/components/dashboard/ChartCard"
+import { ApplicationDataExportCard } from "@/components/dashboard/ApplicationDataExportCard"
 import {
   ChartFilterChips,
   MultiChipPopover,
@@ -644,6 +645,8 @@ export default function HomePage() {
           </ChartCard>
         ) : null}
       </div>
+
+      <ApplicationDataExportCard />
     </div>
   )
 }

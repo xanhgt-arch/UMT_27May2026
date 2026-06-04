@@ -256,10 +256,14 @@ export function ChartFilterChips({
   chartId,
   applicable,
   prefixSlot,
+  labelOverrides,
 }: {
   chartId: string;
   applicable: readonly FilterDim[];
   prefixSlot?: React.ReactNode;
+  labelOverrides?: Partial<
+    Record<Exclude<FilterDim, "range">, { label?: string; allLabel?: string }>
+  >;
 }) {
   const { effective, setOverride, reset } = useChartFilters(chartId, applicable);
 
@@ -330,12 +334,13 @@ export function ChartFilterChips({
 
       {dimChips.map((dim) => {
         const cfg = DIM_CONFIG[dim];
+        const override = labelOverrides?.[dim];
         const selected = effective[dim] as readonly string[];
         return (
           <MultiChipPopover
             key={dim}
             icon={cfg.icon}
-            label={cfg.label}
+            label={override?.label ?? cfg.label}
             options={cfg.options}
             selected={selected}
             onChange={(next) => {
@@ -347,7 +352,7 @@ export function ChartFilterChips({
                 setOverride({ [dim]: next } as ChartFilterOverride);
               }
             }}
-            allLabel={cfg.allLabel}
+            allLabel={override?.allLabel ?? cfg.allLabel}
           />
         );
       })}
