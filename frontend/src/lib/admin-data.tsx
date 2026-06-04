@@ -21,22 +21,13 @@ type AdminCtx = {
 
 const Ctx = createContext<AdminCtx | null>(null)
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined
-const normalizedBackendUrl = backendUrl?.replace(/\/$/, "")
 
 
-const VDI_DATA_URLS = [
-  normalizedBackendUrl
-    ? `${normalizedBackendUrl}/api/vdi`
-    : undefined,`/static/vdi.json`
-].filter((url): url is string => Boolean(url));
+
+const VDI_DATA_URLS = ["/api/vdi"];
 
 
-const DOMAIN_DATA_URLS = [
-  normalizedBackendUrl
-    ? `${normalizedBackendUrl}/api/export/domains-json`
-    : undefined, `/static/domains.json`
-].filter((url): url is string => Boolean(url))
+const DOMAIN_DATA_URLS = ["/api/export/domains-json"];
 
 async function loadJsonWithFallback<T>(urls: readonly string[]): Promise<T> {
   let lastError: unknown

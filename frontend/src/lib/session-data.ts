@@ -51,15 +51,16 @@ export const COMPACT_SESSION = {
 } as const;
 
 async function loadCompactSessions(): Promise<CompactRawSession[]> {
-  const configuredUrl = import.meta.env.VITE_SESSION_DATA_URL as string | undefined;
-  const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined;
+  //const configuredUrl = import.meta.env.VITE_SESSION_DATA_URL as string | undefined;
+  //const backendUrl = "";
 
   
 
+  
   const dataUrls = [
-    configuredUrl,
-    backendUrl ? `${backendUrl.replace(/\/$/, "")}/api/export/raw-sessions-compact` : undefined,"/static/raw-sessions-compact.json",
-  ].filter((url): url is string => Boolean(url));
+    `/api/export/raw-sessions-compact`
+  ];
+
 
   let lastError: unknown;
 

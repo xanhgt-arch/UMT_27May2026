@@ -333,10 +333,11 @@ export default function VdiUsersPage() {
         
         onConfirm={async () => {
           if (deleting) {
-            const backendUrl = import.meta.env.VITE_BACKEND_URL;
+            
 
-            await fetch(`${backendUrl}/api/vdi/${deleting.fullName}`, {
+            await fetch(`/api/vdi/${deleting.fullName}`, {
               method: "DELETE",
+              credentials: "include",
             });
 
             toast.success(`${deleting.fullName} deleted.`);

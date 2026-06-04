@@ -10,7 +10,6 @@ using System.Web.Http.Cors;
 
 namespace UMT.Backend.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     [RoutePrefix("api/export")]
     public class ExportController : ApiController
     {

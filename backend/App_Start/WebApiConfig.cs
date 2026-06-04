@@ -9,8 +9,16 @@ namespace UMT.Backend
         {
             //enable cors
             
-            var cors = new EnableCorsAttribute("*", "*", "*"); // allow all
-            config.EnableCors(cors);
+            
+            // var cors = new EnableCorsAttribute(
+            //     "http://localhost:8080", // your frontend origin
+            //     "*",
+            //     "*"
+            // );
+
+            // cors.SupportsCredentials = true;
+
+            // config.EnableCors(cors);
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
 

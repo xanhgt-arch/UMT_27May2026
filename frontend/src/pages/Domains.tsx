@@ -109,11 +109,11 @@ export default function DomainsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead>Domain</TableHead>
+                  
+                  <TableHead>User</TableHead>
                   <TableHead className="hidden md:table-cell">Region</TableHead>
-                  <TableHead className="hidden text-right md:table-cell">
-                    Users
-                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Domain</TableHead>
+
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>

@@ -60,10 +60,10 @@ export function VdiUserDialog({
     return Object.keys(next).length === 0;
   }
 
+  
   async function handleSubmit() {
     if (!validate()) return;
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const payload = {
       userId: form.fullName,
@@ -71,22 +71,25 @@ export function VdiUserDialog({
       region: form.region,
     };
 
+    const options: RequestInit = {
+      method: isEdit ? "PUT" : "POST",
+      credentials: "include", // ✅ required for Windows Auth
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+
     if (isEdit) {
-      await fetch(`${backendUrl}/api/vdi/${form.fullName}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      await fetch(`/api/vdi/${form.fullName}`, options);
     } else {
-      await fetch(`${backendUrl}/api/vdi`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      await fetch(`/api/vdi`, options);
     }
 
     window.location.reload();
   }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,7 +108,10 @@ export function VdiUserDialog({
           <Field label="User ID" error={errors.fullName}>
             <Input
               value={form.fullName}
+              
+              disabled={isEdit}
               onChange={(e) => set("fullName", e.target.value)}
+
               className="h-11 rounded-lg"
             />
           </Field>
