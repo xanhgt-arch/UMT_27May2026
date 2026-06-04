@@ -269,6 +269,21 @@ export default function HomePage() {
     return { data, availableYears }
   }, [yearlyFilters])
 
+  const yearlyExportRows = useMemo(() => {
+    const visibleYears =
+      yearlySelectedYears.length > 0
+        ? yearlySelectedYears
+        : yearlyChartData.availableYears
+
+    return yearlyChartData.data.map((point) => {
+      const row: Record<string, string | number> = { month: point.month }
+      for (const year of visibleYears) {
+        row[year] = Number(point[year] ?? 0)
+      }
+      return row
+    })
+  }, [yearlyChartData, yearlySelectedYears])
+
   const chartMatches = {
     cad: searchMatches(
       searchQuery,
@@ -509,6 +524,7 @@ export default function HomePage() {
             description="Monthly KBE tool runs, stacked by year. See which years were busier at a glance."
             filter={YEARLY_USAGE_FILTER}
             filterStyle="chips"
+            exportRows={yearlyExportRows}
             filterPrefixSlot={
               <MultiChipPopover
                 icon={CalendarDays}

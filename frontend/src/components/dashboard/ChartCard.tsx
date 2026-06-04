@@ -1,6 +1,21 @@
+import { Download } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ChartFilterPopover } from "./ChartFilterPopover";
 import { ChartFilterChips } from "./ChartFilterChips";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useChartFilters } from "@/lib/filter-context";
+import {
+  buildChartCsvRows,
+  chartCsvFilename,
+  downloadCsv,
+  type CsvRow,
+} from "@/lib/chart-export";
 import { cn } from "@/lib/utils";
 import type { FilterDim } from "@/lib/types";
 
@@ -25,6 +40,8 @@ export type ChartCardProps = {
   filterStyle?: "popover" | "chips";
   /** Extra chip(s) rendered before the standard filter chips (only used when filterStyle="chips"). */
   filterPrefixSlot?: React.ReactNode;
+  /** Optional export rows for charts with extra local controls outside the shared filter state. */
+  exportRows?: CsvRow[];
 };
 
 /**
@@ -40,14 +57,27 @@ export function ChartCard({
   filter,
   filterStyle = "popover",
   filterPrefixSlot,
+  exportRows,
 }: ChartCardProps) {
   const useChips = filter && filterStyle === "chips";
 
-  const right =
-    action ??
-    (filter && !useChips ? (
-      <ChartFilterPopover chartId={filter.id} applicable={filter.applicable} />
-    ) : null);
+  const exportButton = filter ? (
+    <ChartCsvButton
+      title={title}
+      filter={filter}
+      exportRows={exportRows}
+    />
+  ) : null;
+
+  const right = (
+    <div className="flex shrink-0 items-center gap-1.5">
+      {action}
+      {exportButton}
+      {filter && !useChips ? (
+        <ChartFilterPopover chartId={filter.id} applicable={filter.applicable} />
+      ) : null}
+    </div>
+  );
 
   return (
     <Card className={cn("card-brand-shadow overflow-hidden", className)}>
@@ -79,5 +109,42 @@ export function ChartCard({
       </CardHeader>
       <CardContent className="pt-0">{children}</CardContent>
     </Card>
+  );
+}
+
+function ChartCsvButton({
+  title,
+  filter,
+  exportRows,
+}: {
+  title: string;
+  filter: { id: string; applicable: readonly FilterDim[] };
+  exportRows?: CsvRow[];
+}) {
+  const { effective } = useChartFilters(filter.id, filter.applicable);
+
+  const handleDownload = () => {
+    const rows = exportRows ?? buildChartCsvRows(filter.id, effective);
+    downloadCsv(chartCsvFilename(title), rows);
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-sm"
+            className="border-border/80 bg-background/70 text-muted-foreground shadow-sm hover:text-foreground"
+            onClick={handleDownload}
+            aria-label={`Download ${title} as CSV`}
+          >
+            <Download />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Download CSV</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
